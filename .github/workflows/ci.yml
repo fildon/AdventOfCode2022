@@ -1,0 +1,36 @@
+name: CI
+on:
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: "18.x"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v3
+
+      - name: 🤖 Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+      - name: 📥 Install deps
+        run: npm ci
+
+      - name: ✨ npm lint
+        run: npm run lint
+
+      - name: 🧪 npm test
+        run: npm run test

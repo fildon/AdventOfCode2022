@@ -1,2 +1,4 @@
+import { readFileSync } from "fs";
+
 export const getInputStrings = (filePath: string) =>
-  Deno.readTextFileSync(filePath).split(/\r\n/);
+	readFileSync(filePath, { encoding: "utf-8" }).split(/\r\n/);
