@@ -1,5 +1,7 @@
 # Advent Of Code 2022
 
+[![CI](https://github.com/fildon/AdventOfCode2022/actions/workflows/ci.yml/badge.svg)](https://github.com/fildon/AdventOfCode2022/actions/workflows/ci.yml)
+
 These are my solutions to [Advent of Code 2022](https://adventofcode.com/2022/).
 
 ## Dependencies
