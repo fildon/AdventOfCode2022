@@ -6,14 +6,14 @@ type Round = [Shape, Shape];
 /**
  * 1 for Rock, 2 for Paper, and 3 for Scissors
  */
-const shapeScore = (shape: Shape): 1 | 2 | 3 =>
-	shape === "Rock" ? 1 : shape === "Paper" ? 2 : 3;
+const shapeScore = (shape: Shape): number =>
+	["Rock", "Paper", "Scissors"].indexOf(shape) + 1;
 
 /**
  * 0 if you lost, 3 if the round was a draw, and 6 if you won
  */
 const outcomeScore = ([theirPlay, myPlay]: Round): number => {
-	const outcomeMap: Record<Shape, Record<Shape, 0 | 3 | 6>> = {
+	const outcomeMap: Record<Shape, Record<Shape, number>> = {
 		Rock: { Rock: 3, Paper: 6, Scissors: 0 },
 		Paper: { Rock: 0, Paper: 3, Scissors: 6 },
 		Scissors: { Rock: 6, Paper: 0, Scissors: 3 },
