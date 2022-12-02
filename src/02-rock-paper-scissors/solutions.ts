@@ -66,12 +66,19 @@ const decryptRound = (line: string): Round => {
 	return [theirPlay, decryptionMap[theirPlay][myLetter]];
 };
 
+/**
+ *
+ * @see https://adventofcode.com/2022/day/2
+ */
 export const solvePart1 = (filePath: string) =>
 	getInputStrings(filePath)
 		.map(parseRound)
 		.map(getRoundScore)
 		.reduce((a, b) => a + b);
 
+/**
+ * @see https://adventofcode.com/2022/day/2#part2
+ */
 export const solvePart2 = (filePath: string) =>
 	getInputStrings(filePath)
 		.map(decryptRound)
