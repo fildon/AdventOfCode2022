@@ -1,5 +1,23 @@
 import { getInputStrings } from "../utils";
-import { strict as assert } from "node:assert";
+
+type Container = string[];
+type Group = Container[];
+
+const toContainers = (inputLine: string) => [...inputLine];
+
+/**
+ * Given sets A and B, return the set of their intersection
+ */
+const intersect = <Element>(a: Set<Element>, b: Set<Element>) =>
+	new Set([...a.values()].filter((value) => b.has(value)));
+
+/**
+ * Find all items that appear in all provided containers
+ */
+const findDuplicates = <Element>(containers: Element[][]) =>
+	Array.from(
+		containers.map((container) => new Set(container)).reduce(intersect)
+	);
 
 /**
  * Lowercase item types a through z have priorities 1 through 26.
@@ -14,26 +32,14 @@ const getItemPriority = (item: string): number => {
 		: charCode - "A".charCodeAt(0) + 27;
 };
 
-const itemInEvery = (matchingSets: Set<string>[]) => (item: string) =>
-	matchingSets.every((container) => container.has(item));
-
-const findDuplicate = ([headContainer, ...tailContainers]: string[]) => {
-	const matchingSets = tailContainers.map(
-		(container) => new Set([...container])
-	);
-	return [...headContainer].find(itemInEvery(matchingSets));
-};
-
 /**
  * Each rucksack contains exactly one letter that appears in the first and last half
  */
-const getRucksackPriority = (ruckSack: string): number => {
+const getRucksackPriority = (ruckSack: Container): number => {
 	const compartmentSize = ruckSack.length / 2;
 	const firstHalf = ruckSack.slice(0, compartmentSize);
 	const secondHalf = ruckSack.slice(compartmentSize);
-	const duplicate = findDuplicate([firstHalf, secondHalf]);
-	assert(duplicate);
-	return getItemPriority(duplicate);
+	return getItemPriority(findDuplicates([firstHalf, secondHalf])[0]);
 };
 
 /**
@@ -41,13 +47,14 @@ const getRucksackPriority = (ruckSack: string): number => {
  */
 export const solvePart1 = (filePath: string) =>
 	getInputStrings(filePath)
+		.map(toContainers)
 		.map(getRucksackPriority)
 		.reduce((a, b) => a + b);
 
 /**
- * Group each set of three lines
+ * Group containers in batches of three
  */
-const group = ([currentGroup, ...otherGroups]: string[][], rucksack: string) =>
+const group = ([currentGroup, ...otherGroups]: Group[], rucksack: Container) =>
 	currentGroup.length < 3
 		? [[rucksack, ...currentGroup], ...otherGroups]
 		: [[rucksack], currentGroup, ...otherGroups];
@@ -55,17 +62,15 @@ const group = ([currentGroup, ...otherGroups]: string[][], rucksack: string) =>
 /**
  * Find the duplicate in the group and return its priority
  */
-const getGroupPriority = (group: string[]): number => {
-	const duplicate = findDuplicate(group);
-	assert(duplicate);
-	return getItemPriority(duplicate);
-};
+const getGroupPriority = (group: Group): number =>
+	getItemPriority(findDuplicates(group)[0]);
 
 /**
  * @see https://adventofcode.com/2022/day/3#part2
  */
 export const solvePart2 = (filePath: string) =>
 	getInputStrings(filePath)
-		.reduce(group, [[]])
+		.map(toContainers)
+		.reduce(group, [[]]) // Second arg is the initially empty group
 		.map(getGroupPriority)
 		.reduce((a, b) => a + b);
