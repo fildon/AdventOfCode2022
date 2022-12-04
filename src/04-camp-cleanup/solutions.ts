@@ -17,8 +17,17 @@ const toRangePair = (line: string): RangePair => {
 	throw new Error(`Unrecognised line: ${line}`);
 };
 
-const overlaps = ([[aStart, aEnd], [bStart, bEnd]]: RangePair): boolean =>
+const fullyOverlaps = ([[aStart, aEnd], [bStart, bEnd]]: RangePair): boolean =>
 	(aStart <= bStart && aEnd >= bEnd) || (bStart <= aStart && bEnd >= aEnd);
 
 export const solvePart1 = (filePath: string) =>
-	getInputStrings(filePath).map(toRangePair).filter(overlaps).length;
+	getInputStrings(filePath).map(toRangePair).filter(fullyOverlaps).length;
+
+const partiallyOverlaps = ([
+	[aStart, aEnd],
+	[bStart, bEnd],
+]: RangePair): boolean =>
+	(aStart <= bEnd && aEnd >= bStart) || (bStart <= aEnd && bEnd >= aStart);
+
+export const solvePart2 = (filePath: string) =>
+	getInputStrings(filePath).map(toRangePair).filter(partiallyOverlaps).length;
