@@ -25,7 +25,7 @@ const parseFile = (
 		line
 			.split("")
 			// Fetch only the relevant input columns
-			.filter((_, i) => (i - 1) % 4 === 0)
+			.filter((_, i) => i % 4 === 1)
 			// Push only the non-empty items to their columns
 			.forEach((char, i) => char !== " " && stacks[i].push(char))
 	);
