@@ -130,21 +130,6 @@ const constructFileSystem = (commands: Array<Line>): Directory => {
 	).fileSystem;
 };
 
-const _prettyString =
-	(indentSize = 0) =>
-	({ name, subDirectories, files }: Directory): string => {
-		const indent = Array.from({ length: indentSize * 2 })
-			.map(() => " ")
-			.join("");
-		const prettySubDirs = subDirectories.map(_prettyString(indentSize + 1));
-		const prettyFiles = files.map(
-			({ name, size }) => `${indent}  - ${name} (file, size=${size})`
-		);
-		return [`${indent}- ${name} (dir)`, ...prettyFiles, ...prettySubDirs].join(
-			"\n"
-		);
-	};
-
 /**
  * Given a directory annotates it with a size.
  *
