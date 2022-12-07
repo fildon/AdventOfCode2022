@@ -4,6 +4,7 @@
 	},
 	"scripts": {
 		"lint": "npx prettier --check src/**/*.ts && npx eslint . --ext .ts",
+		"format": "npx prettier --write src/**/*.ts",
 		"test": "jest"
 	},
 	"dependencies": {
