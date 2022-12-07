@@ -130,13 +130,13 @@ const constructFileSystem = (commands: Array<Line>): Directory => {
 	).fileSystem;
 };
 
-const prettyString =
+const _prettyString =
 	(indentSize = 0) =>
 	({ name, subDirectories, files }: Directory): string => {
 		const indent = Array.from({ length: indentSize * 2 })
 			.map(() => " ")
 			.join("");
-		const prettySubDirs = subDirectories.map(prettyString(indentSize + 1));
+		const prettySubDirs = subDirectories.map(_prettyString(indentSize + 1));
 		const prettyFiles = files.map(
 			({ name, size }) => `${indent}  - ${name} (file, size=${size})`
 		);
@@ -177,3 +177,20 @@ export const solvePart1 = (filePath: string): number =>
 	)
 		.filter(({ size }) => size <= 100000)
 		.reduce((acc, { size }) => acc + size, 0);
+
+export const solvePart2 = (filePath: string): number => {
+	const root = measureDirectory(
+		constructFileSystem(getInputStrings(filePath).map(parseInputLine))
+	);
+
+	const totalDiskSpace = 70000000;
+	const requiredSpace = 30000000;
+	const usedSpace = root.size;
+	const availableSpace = totalDiskSpace - usedSpace;
+	const needToFreeUp = requiredSpace - availableSpace;
+
+	return flattenDirectories(root)
+		.map(({ size }) => size)
+		.filter((size) => size >= needToFreeUp)
+		.sort((a, b) => a - b)[0];
+};
