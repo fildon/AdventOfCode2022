@@ -66,62 +66,85 @@ const parseInputLine = (inputLine: string): Line => {
 	throw new Error(`Unrecognised inputLine: ${inputLine}`);
 };
 
+const handleCDLine = (
+	root: Directory,
+	fileSystem: Directory,
+	currentDir: Directory,
+	target: string
+) => {
+	// $ cd /
+	if (target === "/") {
+		return { fileSystem: root, currentDir: root };
+	}
+	// $ cd ..
+	if (target === "..") {
+		return { fileSystem, currentDir: currentDir?.parent ?? root };
+	}
+	// $ cd foo
+	const targetDirectory = currentDir.subDirectories.find(
+		({ name }) => name === target
+	);
+	if (!targetDirectory) {
+		throw new Error(`Could not find cd target: ${target}`);
+	}
+	return { fileSystem, currentDir: targetDirectory };
+};
+
+const handleDirLine = (
+	fileSystem: Directory,
+	currentDir: Directory,
+	name: string
+) => {
+	// Avoid duplicating a directory we have already seen
+	const alreadyExists = currentDir.subDirectories.find(
+		({ name: subName }) => subName === name
+	);
+	if (!alreadyExists) {
+		currentDir.subDirectories.push({
+			name,
+			parent: currentDir,
+			files: [],
+			subDirectories: [],
+		});
+	}
+	return { fileSystem, currentDir };
+};
+
+const handleFileLine = (
+	fileSystem: Directory,
+	currentDir: Directory,
+	name: string,
+	size: number
+) => {
+	const alreadyExists = currentDir.files.find(
+		({ name: otherName }) => otherName === name
+	);
+	// Avoid duplicating a file we've already seen
+	if (!alreadyExists) {
+		currentDir.files.push({
+			name,
+			size,
+		});
+	}
+	return { fileSystem, currentDir };
+};
+
 const constructFileSystem = (commands: Array<Line>): Directory => {
 	const root: Directory = { name: "/", files: [], subDirectories: [] };
 
 	return commands.reduce(
 		({ fileSystem, currentDir }, curr) => {
-			if (curr.type === "cd") {
-				// $ cd /
-				if (curr.target === "/") {
-					return { fileSystem: root, currentDir: root };
-				}
-				// $ cd ..
-				if (curr.target === "..") {
-					return { fileSystem, currentDir: currentDir?.parent ?? root };
-				}
-				// $ cd foo
-				const targetDirectory = currentDir.subDirectories.find(
-					({ name }) => name === curr.target
-				);
-				if (!targetDirectory) {
-					throw new Error(`Could not find cd target: ${curr.target}`);
-				}
-				return { fileSystem, currentDir: targetDirectory };
+			switch (curr.type) {
+				case "cd":
+					return handleCDLine(root, fileSystem, currentDir, curr.target);
+				case "ls":
+					// Happy to treat ls as a no-op
+					return { fileSystem, currentDir };
+				case "dir":
+					return handleDirLine(fileSystem, currentDir, curr.name);
+				case "file":
+					return handleFileLine(fileSystem, currentDir, curr.name, curr.size);
 			}
-			if (curr.type === "ls") {
-				// Happy to treat ls as a no-op
-				return { fileSystem, currentDir };
-			}
-			if (curr.type === "dir") {
-				// Avoid duplicating a directory we have already seen
-				const alreadyExists = currentDir.subDirectories.find(
-					({ name }) => name === curr.name
-				);
-				if (!alreadyExists) {
-					currentDir.subDirectories.push({
-						name: curr.name,
-						parent: currentDir,
-						files: [],
-						subDirectories: [],
-					});
-				}
-				return { fileSystem, currentDir };
-			}
-			if (curr.type === "file") {
-				// Avoid duplicating a file we've already seen
-				const alreadyExists = currentDir.files.find(
-					({ name }) => name === curr.name
-				);
-				if (!alreadyExists) {
-					currentDir.files.push({
-						name: curr.name,
-						size: curr.size,
-					});
-				}
-				return { fileSystem, currentDir };
-			}
-			throw new Error("Unhandled Line");
 		},
 		{
 			fileSystem: root,
@@ -147,7 +170,7 @@ const measureDirectory = (dir: Directory): SizedDirectory => {
 };
 
 /**
- * Recursively flatten the directory hierachy to a simple list
+ * Recursively flatten the directory hierarchy to a simple list
  */
 const flattenDirectories = (dir: SizedDirectory): Array<SizedDirectory> => [
 	dir,
