@@ -4,6 +4,7 @@ type Vector = [number, number];
 type Direction = "U" | "D" | "L" | "R";
 const isDirection = (dir: string): dir is Direction =>
 	["U", "D", "L", "R"].includes(dir);
+export type Rope = Array<Vector>;
 
 const parseInputLine = (inputLine: string): Array<Direction> => {
 	const [dir, qty] = inputLine.split(" ");
@@ -58,6 +59,43 @@ export const solvePart1 = (filePath: string): number =>
 			{
 				head: [0, 0] as Vector,
 				tail: [0, 0] as Vector,
+				visited: new Set(["0,0"]),
+			}
+		).visited.size;
+
+/**
+ * Given a rope which might have gaps in it
+ * contract it until each segment is a neighbour to its prior segment
+ */
+const contract = (rope: Rope): Rope => {
+	for (let i = 1; i < rope.length; i++) {
+		rope[i] = follow(rope[i - 1], rope[i]);
+	}
+	return rope;
+};
+
+/**
+ * Move the head of the rope by the given direction
+ * then contract the tail so it all follows
+ */
+export const advanceRope = (rope: Rope, direction: Direction): Rope => {
+	const [head, ...tail] = rope;
+	const newHead = move(head, direction);
+	return contract([newHead, ...tail]);
+};
+
+export const solvePart2 = (filePath: string): number =>
+	getInputStrings(filePath)
+		.flatMap(parseInputLine)
+		.reduce(
+			({ rope, visited }, direction) => {
+				const newRope = advanceRope(rope, direction);
+				// The tail is at the 9th index
+				visited.add(`${newRope[9][0]},${newRope[9][1]}`);
+				return { rope: newRope, visited };
+			},
+			{
+				rope: Array.from({ length: 10 }).map(() => [0, 0]) as Rope,
 				visited: new Set(["0,0"]),
 			}
 		).visited.size;
