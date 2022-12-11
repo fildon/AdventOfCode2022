@@ -1,4 +1,4 @@
-import { getInputStrings } from "../utils";
+import { getInput } from "../utils";
 
 type Monkey = {
 	items: Array<number>;
@@ -25,6 +25,12 @@ export const buildMonkey = (monkeyStrings: Array<string>): Monkey => {
 		worry % divisor === 0 ? trueTarget : falseTarget;
 	return { items, operation, throwTarget };
 };
+
+export const buildMonkeys = (input: string): Array<Monkey> =>
+	input
+		.split("\n\n")
+		.map((monkeyInputSection) => monkeyInputSection.split("\n"))
+		.map(buildMonkey);
 
 export const solvePart1 = (filePath: string): number => {
 	return -1;
