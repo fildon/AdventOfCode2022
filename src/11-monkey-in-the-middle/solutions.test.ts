@@ -1,4 +1,4 @@
-import { buildMonkey, buildMonkeys, solvePart1 } from "./solutions";
+import { buildMonkey, buildMonkeys, solvePart1, solvePart2 } from "./solutions";
 
 describe("buildMonkey", () => {
 	test("with multiplier", () => {
@@ -13,8 +13,9 @@ describe("buildMonkey", () => {
 		const testMonkey = buildMonkey(inputStrings);
 		expect(testMonkey.items).toEqual([79, 98]);
 		expect(testMonkey.operation(1)).toBe(19);
-		expect(testMonkey.throwTarget(23)).toBe(2);
-		expect(testMonkey.throwTarget(24)).toBe(3);
+		expect(testMonkey.divisor).toBe(23);
+		expect(testMonkey.trueTarget).toBe(2);
+		expect(testMonkey.falseTarget).toBe(3);
 	});
 	test("with adder", () => {
 		const inputStrings = [
@@ -28,8 +29,9 @@ describe("buildMonkey", () => {
 		const testMonkey = buildMonkey(inputStrings);
 		expect(testMonkey.items).toEqual([54, 65, 75, 74]);
 		expect(testMonkey.operation(1)).toBe(7);
-		expect(testMonkey.throwTarget(18)).toBe(0);
-		expect(testMonkey.throwTarget(19)).toBe(2);
+		expect(testMonkey.divisor).toBe(19);
+		expect(testMonkey.trueTarget).toBe(2);
+		expect(testMonkey.falseTarget).toBe(0);
 	});
 });
 
@@ -49,7 +51,7 @@ Monkey 3:
     If false: throw to monkey 1`;
 	const monkeys = buildMonkeys(inputString);
 	expect(monkeys).toHaveLength(2);
-	expect(monkeys[0].throwTarget(13)).toBe(1);
+	expect(monkeys[0].divisor).toBe(13);
 	expect(monkeys[1].operation(10)).toBe(13);
 });
 
@@ -58,4 +60,10 @@ test("part1 test input", () => {
 });
 test("part1 real input", () => {
 	expect(solvePart1(`${__dirname}/input-real.txt`)).toBe(58322);
+});
+test("part2 test input", () => {
+	expect(solvePart2(`${__dirname}/input-test.txt`)).toBe(2713310158);
+});
+test("part2 real input", () => {
+	expect(solvePart2(`${__dirname}/input-real.txt`)).toBe(13937702909);
 });
