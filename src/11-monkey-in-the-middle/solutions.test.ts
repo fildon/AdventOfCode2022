@@ -1,4 +1,4 @@
-import { buildMonkey, buildMonkeys } from "./solutions";
+import { buildMonkey, buildMonkeys, solvePart1 } from "./solutions";
 
 describe("buildMonkey", () => {
 	test("with multiplier", () => {
@@ -51,4 +51,11 @@ Monkey 3:
 	expect(monkeys).toHaveLength(2);
 	expect(monkeys[0].throwTarget(13)).toBe(1);
 	expect(monkeys[1].operation(10)).toBe(13);
+});
+
+test("part1 test input", () => {
+	expect(solvePart1(`${__dirname}/input-test.txt`)).toBe(10605);
+});
+test("part1 real input", () => {
+	expect(solvePart1(`${__dirname}/input-real.txt`)).toBe(58322);
 });
