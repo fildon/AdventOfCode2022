@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 
 export const sum = (a: number, b: number) => a + b;
+export const product = (a: number, b: number) => a * b;
 
 /**
  * Descending sort comparator

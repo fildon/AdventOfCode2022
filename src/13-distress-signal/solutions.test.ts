@@ -1,4 +1,4 @@
-import { compare, solvePart1 } from "./solutions";
+import { compare, solvePart1, solvePart2 } from "./solutions";
 
 describe("compare", () => {
 	test("examples", () => {
@@ -23,4 +23,11 @@ test("part1 test input", () => {
 });
 test("part1 real input", () => {
 	expect(solvePart1(`${__dirname}/input-real.txt`)).toBe(5196);
+});
+
+test("part2 test input", () => {
+	expect(solvePart2(`${__dirname}/input-test.txt`)).toBe(140);
+});
+test("part2 real input", () => {
+	expect(solvePart2(`${__dirname}/input-real.txt`)).toBe(22134);
 });

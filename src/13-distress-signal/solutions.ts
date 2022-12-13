@@ -1,4 +1,4 @@
-import { getInput, sum } from "../utils";
+import { getInput, getInputStrings, product, sum } from "../utils";
 
 type Packet = Array<number | Packet>;
 
@@ -30,9 +30,31 @@ export const compare = (a: Packet, b: Packet): number => {
 export const solvePart1 = (filePath: string) =>
 	getInput(filePath)
 		.split("\n\n")
-		.map((pair) => pair.split("\n").map((line) => JSON.parse(line) as Packet))
+		.map((pairsString) =>
+			pairsString.split("\n").map((line) => JSON.parse(line) as Packet)
+		)
 		.map(([a, b]) => compare(a, b))
-		.map((result, i) => ({ index: i + 1, result }))
-		.filter(({ result }) => result < 0)
+		// Note: convert to 1-index here
+		.map((order, i) => ({ index: i + 1, order }))
+		// Take only the correctly ordered results
+		.filter(({ order }) => order < 0)
+		// Add up all the indexes of the correctly ordered results
 		.map(({ index }) => index)
 		.reduce(sum);
+
+const dividers: Array<Packet> = [[[2]], [[6]]];
+export const solvePart2 = (filePath: string) =>
+	[
+		...dividers,
+		...getInputStrings(filePath)
+			.filter((line) => line.length > 0)
+			.map((line) => JSON.parse(line) as Packet),
+	]
+		.sort(compare)
+		// Note: convert to 1-index here
+		.map((packet, i) => ({ index: i + 1, packet }))
+		// Find the dividers
+		.filter(({ packet }) => dividers.includes(packet))
+		// Return the product of their indexes
+		.map(({ index }) => index)
+		.reduce(product, 1);
