@@ -1,5 +1,8 @@
 type Packet = Array<number | Packet>;
 
+const forceArray = (value: number | Packet): Packet =>
+	Array.isArray(value) ? value : [value];
+
 /**
  * Implements a Total Order over the Packet type
  *
@@ -13,19 +16,13 @@ export const compare = (a: Packet, b: Packet): number => {
 
 	const [aHead, ...aTail] = a;
 	const [bHead, ...bTail] = b;
-	if (Array.isArray(aHead)) {
-		if (Array.isArray(bHead)) {
-			return compare(aHead, bHead) || compare(aTail, bTail);
-		} else {
-			return compare(aHead, [bHead]) || compare(aTail, bTail);
-		}
-	} else {
-		if (Array.isArray(bHead)) {
-			return compare([aHead], bHead) || compare(aTail, bTail);
-		} else {
-			return aHead - bHead || compare(aTail, bTail);
-		}
-	}
+
+	// If both heads are numbers, compare directly. Recurse on tail in case of tie.
+	if (!Array.isArray(aHead) && !Array.isArray(bHead))
+		return aHead - bHead || compare(aTail, bTail);
+
+	// Compare both as though they were arrays. Recurse on tail in case of tie.
+	return compare(forceArray(aHead), forceArray(bHead)) || compare(aTail, bTail);
 };
 
 export const solvePart1 = (filePath: string) => {

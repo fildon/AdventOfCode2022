@@ -19,7 +19,7 @@ describe.only("compare", () => {
 });
 
 test("part1 test input", () => {
-	expect(solvePart1(`${__dirname}/input-test.txt`)).toBe("TBC");
+	expect(solvePart1(`${__dirname}/input-test.txt`)).toBe(13);
 });
 test("part1 real input", () => {
 	expect(solvePart1(`${__dirname}/input-real.txt`)).toBe("TBC");
