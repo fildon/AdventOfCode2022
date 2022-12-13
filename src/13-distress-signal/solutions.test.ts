@@ -1,6 +1,6 @@
 import { compare, solvePart1 } from "./solutions";
 
-describe.only("compare", () => {
+describe("compare", () => {
 	test("examples", () => {
 		expect(compare([1, 1, 3, 1, 1], [1, 1, 5, 1, 1])).toBeLessThan(0);
 		expect(compare([[1], [2, 3, 4]], [[1], 4])).toBeLessThan(0);
@@ -22,5 +22,5 @@ test("part1 test input", () => {
 	expect(solvePart1(`${__dirname}/input-test.txt`)).toBe(13);
 });
 test("part1 real input", () => {
-	expect(solvePart1(`${__dirname}/input-real.txt`)).toBe("TBC");
+	expect(solvePart1(`${__dirname}/input-real.txt`)).toBe(5196);
 });

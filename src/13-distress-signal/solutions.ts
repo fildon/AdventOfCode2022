@@ -1,3 +1,5 @@
+import { getInput, sum } from "../utils";
+
 type Packet = Array<number | Packet>;
 
 const forceArray = (value: number | Packet): Packet =>
@@ -25,6 +27,12 @@ export const compare = (a: Packet, b: Packet): number => {
 	return compare(forceArray(aHead), forceArray(bHead)) || compare(aTail, bTail);
 };
 
-export const solvePart1 = (filePath: string) => {
-	return -1;
-};
+export const solvePart1 = (filePath: string) =>
+	getInput(filePath)
+		.split("\n\n")
+		.map((pair) => pair.split("\n").map((line) => JSON.parse(line) as Packet))
+		.map(([a, b]) => compare(a, b))
+		.map((result, i) => ({ index: i + 1, result }))
+		.filter(({ result }) => result < 0)
+		.map(({ index }) => index)
+		.reduce(sum);
