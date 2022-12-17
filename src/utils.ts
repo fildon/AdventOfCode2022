@@ -3,6 +3,13 @@ import { readFileSync } from "fs";
 export const sum = (a: number, b: number) => a + b;
 export const product = (a: number, b: number) => a * b;
 export const max = (a: number, b: number) => Math.max(a, b);
+export const min = (a: number, b: number) => Math.min(a, b);
+
+/**
+ * Returns an array of numbers counting up from `from` to `to` inclusive.
+ */
+export const range = (from: number, to: number) =>
+	Array.from({ length: to - from + 1 }).map((_, i) => from + i);
 
 /**
  * Descending sort comparator
