@@ -2,6 +2,7 @@ import { readFileSync } from "fs";
 
 export const sum = (a: number, b: number) => a + b;
 export const product = (a: number, b: number) => a * b;
+export const max = (a: number, b: number) => Math.max(a, b);
 
 /**
  * Descending sort comparator
