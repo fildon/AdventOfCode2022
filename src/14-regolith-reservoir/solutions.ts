@@ -69,10 +69,10 @@ const toString = (wall: Wall): string => {
 		.join("\n");
 };
 
-const hasDescendedIntoVoid = (wall: Wall, vec?: Vector) => {
-	if (!vec) return false;
+const createInBound = (voidDepth: number) => (vec?: Vector) => {
+	if (!vec) return true;
 	const [, vecY] = toNumericVector(vec);
-	return [...wall].map(toNumericVector).every(([, wallY]) => wallY < vecY);
+	return vecY < voidDepth;
 };
 
 export const solvePart1 = (
@@ -87,10 +87,17 @@ export const solvePart1 = (
 		console.log(toString(walls));
 	}
 
+	const inBound = createInBound(
+		[...walls]
+			.map(toNumericVector)
+			.map(([, y]) => y)
+			.reduce(max) + 1
+	);
+
 	let sandCount = 0;
 	const fallingPath: Array<Vector> = [];
 
-	while (!hasDescendedIntoVoid(walls, fallingPath.at(-1))) {
+	while (inBound(fallingPath.at(-1))) {
 		const currentPosition = fallingPath.at(-1) ?? "500,0";
 
 		// Try to descend in each of the three downward directions
@@ -99,6 +106,56 @@ export const solvePart1 = (
 		} else if (!walls.has(downL(currentPosition))) {
 			fallingPath.push(downL(currentPosition));
 		} else if (!walls.has(downR(currentPosition))) {
+			fallingPath.push(downR(currentPosition));
+		} else {
+			// Nowhere to go, so settle
+			walls.add(currentPosition);
+			// The next grain will resume from one step prior on the path
+			fallingPath.pop();
+			sandCount++;
+
+			if (debug) {
+				console.log(toString(walls));
+			}
+		}
+	}
+
+	return sandCount;
+};
+
+export const solvePart2 = (
+	filePath: string,
+	{ debug = false }: { debug?: boolean } = {}
+): number => {
+	const walls = getInputStrings(filePath)
+		.map(parseInputLine)
+		.reduce(merge, new Set());
+
+	if (debug) {
+		console.log(toString(walls));
+	}
+
+	// The bottom bound is 2 plus the highest Y coordinate
+	const bottomBound =
+		[...walls]
+			.map(toNumericVector)
+			.map(([, y]) => y)
+			.reduce(max) + 2;
+
+	let sandCount = 0;
+	const fallingPath: Array<Vector> = [];
+
+	while (!walls.has("500,0")) {
+		const currentPosition = fallingPath.at(-1) ?? "500,0";
+		const [, currentY] = toNumericVector(currentPosition);
+		const aboveBound = currentY < bottomBound - 1;
+
+		// Try to descend in each of the three downward directions
+		if (aboveBound && !walls.has(down(currentPosition))) {
+			fallingPath.push(down(currentPosition));
+		} else if (aboveBound && !walls.has(downL(currentPosition))) {
+			fallingPath.push(downL(currentPosition));
+		} else if (aboveBound && !walls.has(downR(currentPosition))) {
 			fallingPath.push(downR(currentPosition));
 		} else {
 			// Nowhere to go, so settle
