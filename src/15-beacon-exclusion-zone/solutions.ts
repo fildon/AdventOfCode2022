@@ -81,3 +81,31 @@ export const solvePart1 = (
 
 	return exclusionZone.size();
 };
+
+const tuningFrequency = ([x, y]: Vector) => 4000000 * x + y;
+
+export const solvePart2 = (filePath: string, upperLimit: number) => {
+	const sensors = getInputStrings(filePath)
+		.map(parseInputLine)
+		.map(({ sensor, beacon }) => ({
+			centre: sensor,
+			radius: distance(sensor, beacon),
+		}));
+	for (let y = 0; y <= upperLimit; y++) {
+		let x = 0;
+		while (x <= upperLimit) {
+			const intersectingSensor = sensors.find(
+				({ centre, radius }) => distance(centre, [x, y]) <= radius
+			);
+
+			if (!intersectingSensor) return tuningFrequency([x, y]);
+			const { centre, radius } = intersectingSensor;
+
+			// advance x to beyond the sensor range
+			const xOffset = radius - Math.abs(centre[1] - y);
+			x = centre[0] + xOffset + 1;
+		}
+	}
+
+	throw new Error("No valid beacon location found");
+};
