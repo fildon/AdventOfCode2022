@@ -16,7 +16,7 @@ type Monkey = NodeMonkey | LeafMonkey;
 
 const leafMonkeyRegex = /^(?<name>[a-z]{4}): (?<value>-?\d+)$/;
 const nodeMonkeyRegex =
-	/^(?<name>[a-z]{4}): (?<arg1>[a-z]{4}) (?<op>[+\-\*/]) (?<arg2>[a-z]{4})$/;
+	/^(?<name>[a-z]{4}): (?<arg1>[a-z]{4}) (?<op>[+\-*/]) (?<arg2>[a-z]{4})$/;
 const parseMonkey = (line: string): Monkey => {
 	const leafMatch = line.match(leafMonkeyRegex);
 	if (leafMatch?.groups) {
