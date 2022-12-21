@@ -31,17 +31,7 @@ const rotate =
 		debugLog(nums);
 	};
 
-export const solvePart1 = (
-	filePath: string,
-	{ debug = false }: { debug?: boolean } = {}
-) => {
-	const debugLog = createLogger(debug);
-	const nums = getInputStrings(filePath)
-		.map((x) => parseInt(x))
-		.map<Num>((value, position) => ({ value, position }));
-
-	nums.forEach(rotate(debugLog));
-
+const getGroveCoordinates = (nums: Array<Num>) => {
 	const zeroPosition = nums.find(({ value }) => value === 0)?.position;
 	if (zeroPosition === undefined) throw new Error("We lost the zero!");
 
@@ -53,7 +43,37 @@ export const solvePart1 = (
 		)
 		.map(({ value }) => value);
 
-	debugLog(groveCoordinates);
-
 	return groveCoordinates.reduce(sum);
+};
+
+export const solvePart1 = (
+	filePath: string,
+	{ debug = false }: { debug?: boolean } = {}
+) => {
+	const debugLog = createLogger(debug);
+	const nums = getInputStrings(filePath)
+		.map((x) => parseInt(x))
+		.map<Num>((value, position) => ({ value, position }));
+
+	nums.forEach(rotate(debugLog));
+
+	return getGroveCoordinates(nums);
+};
+
+const DECRYPTION_KEY = 811589153;
+export const solvePart2 = (
+	filePath: string,
+	{ debug = false }: { debug?: boolean } = {}
+) => {
+	const debugLog = createLogger(debug);
+	const nums = getInputStrings(filePath)
+		.map((x) => parseInt(x))
+		.map((x) => x * DECRYPTION_KEY)
+		.map<Num>((value, position) => ({ value, position }));
+
+	Array.from({ length: 10 }).forEach(() => {
+		nums.forEach(rotate(debugLog));
+	});
+
+	return getGroveCoordinates(nums);
 };
