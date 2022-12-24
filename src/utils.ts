@@ -26,8 +26,6 @@ export const getInput = (filePath: string): string =>
 export const getInputStrings = (filePath: string): string[] =>
 	getInput(filePath).split(/\n/g);
 
-export const createLogger =
-	(debug: boolean): typeof console.log =>
-	(...data) => {
-		if (debug) console.log(data);
-	};
+export const createLogger = (debug: boolean) => (data: string) => {
+	if (debug) console.log(data);
+};
