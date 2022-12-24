@@ -58,9 +58,9 @@ const howManyEmptyTiles = (elves: ElfFormation["elves"]) => {
 	return totalArea - elves.size;
 };
 
-const formationToString = ({ elves, preferredDirections }: ElfFormation) => {
+const formationToString = ({ elves }: ElfFormation) => {
 	const { minX, maxX, minY, maxY } = bounds(elves);
-	const map = range(minY, maxY)
+	return range(minY, maxY)
 		.map((y) =>
 			range(minX, maxX)
 				.map((x) => toStringCoord([x, y]))
@@ -69,9 +69,6 @@ const formationToString = ({ elves, preferredDirections }: ElfFormation) => {
 		)
 		.reverse()
 		.join("\n");
-	const directions = `Preferred Directions: ${preferredDirections.join(", ")}`;
-	const emptyTiles = `Empty tiles: ${howManyEmptyTiles(elves)}`;
-	return [map, directions, emptyTiles].join("\n");
 };
 
 const parseCoordinate =
@@ -116,7 +113,9 @@ const propose =
 		return [];
 	};
 
-const step = (formation: ElfFormation): ElfFormation => {
+const step = (
+	formation: ElfFormation
+): { formation: ElfFormation; moved: number } => {
 	const { elves, preferredDirections } = formation;
 
 	// Each elf proposes a move
@@ -153,13 +152,16 @@ const step = (formation: ElfFormation): ElfFormation => {
 	]);
 
 	return {
-		elves: newElves,
-		preferredDirections: [
-			preferredDirections[1],
-			preferredDirections[2],
-			preferredDirections[3],
-			preferredDirections[0],
-		],
+		formation: {
+			elves: newElves,
+			preferredDirections: [
+				preferredDirections[1],
+				preferredDirections[2],
+				preferredDirections[3],
+				preferredDirections[0],
+			],
+		},
+		moved: validProposals.length,
 	};
 };
 
@@ -176,11 +178,40 @@ export const solvePart1 = (
 	};
 
 	const tenStepsLater = range(0, 9).reduce((state, rounds) => {
-		debugLog(`After ${rounds} rounds:\n${formationToString(state)}`);
-		return step(state);
+		debugLog(() => `After ${rounds} rounds:\n${formationToString(state)}`);
+		return step(state).formation;
 	}, initialFormation);
 
-	debugLog(`Final state:\n${formationToString(tenStepsLater)}`);
+	debugLog(() => `Final state:\n${formationToString(tenStepsLater)}`);
 
 	return howManyEmptyTiles(tenStepsLater.elves);
+};
+
+export const solvePart2 = (
+	filePath: string,
+	{ debug = false }: { debug?: boolean } = {}
+) => {
+	const debugLog = createLogger(debug);
+	const lines = getInputStrings(filePath);
+
+	let formation: ElfFormation = {
+		elves: new Set(lines.flatMap(parseLine(lines.length))),
+		preferredDirections: ["N", "S", "W", "E"],
+	};
+
+	let anyMoved = true;
+	let roundCount = 0;
+	while (anyMoved) {
+		const { formation: newFormation, moved } = step(formation);
+		formation = newFormation;
+		anyMoved = moved > 0;
+		roundCount++;
+		debugLog(
+			() => `After ${roundCount} rounds:\n${formationToString(formation)}`
+		);
+	}
+
+	debugLog(() => `Final state:\n${formationToString(formation)}`);
+
+	return roundCount;
 };

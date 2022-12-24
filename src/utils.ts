@@ -26,6 +26,10 @@ export const getInput = (filePath: string): string =>
 export const getInputStrings = (filePath: string): string[] =>
 	getInput(filePath).split(/\n/g);
 
-export const createLogger = (debug: boolean) => (data: string) => {
-	if (debug) console.log(data);
-};
+export type LazyLogger = (callback: () => string) => void;
+
+export const createLogger =
+	(debug: boolean): LazyLogger =>
+	(callback) => {
+		if (debug) console.log(callback());
+	};

@@ -62,7 +62,7 @@ export const solvePart1 = (
 			.map(parseMonkey)
 			.map((monkey) => [monkey.name, monkey])
 	);
-	debugLog(monkeys);
+	debugLog(() => JSON.stringify(monkeys));
 
 	return computeMonkeyValue(monkeys)("root");
 };
