@@ -1,4 +1,4 @@
-import { getInputStrings, sum, createLogger } from "../utils";
+import { getInputStrings, sum, createLogger, type LazyLogger } from "../utils";
 
 type Num = {
 	value: number;
@@ -9,7 +9,7 @@ const positiveMod = (value: number, mod: number) =>
 	(value + (value >= 0 ? 0 : Math.ceil(-value / mod) * mod)) % mod;
 
 const rotate =
-	(debugLog: typeof console.log) => (num: Num, _: number, nums: Array<Num>) => {
+	(debugLog: LazyLogger) => (num: Num, _: number, nums: Array<Num>) => {
 		if (num.value === 0) return;
 		const currentPosition = num.position;
 		const targetPosition = positiveMod(
@@ -17,7 +17,7 @@ const rotate =
 			nums.length - 1
 		);
 		debugLog(
-			`${num.value} moves from ${currentPosition} to ${targetPosition}:`
+			() => `${num.value} moves from ${currentPosition} to ${targetPosition}:`
 		);
 		// Downshift every number that was above
 		nums.forEach(
@@ -28,7 +28,9 @@ const rotate =
 			(other) => (other.position += other.position >= targetPosition ? 1 : 0)
 		);
 		num.position = targetPosition;
-		debugLog(nums);
+		debugLog(() =>
+			nums.map(({ value, position }) => `${position}: ${value}`).join("\n")
+		);
 	};
 
 const getGroveCoordinates = (nums: Array<Num>) => {
