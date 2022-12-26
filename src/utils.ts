@@ -33,3 +33,24 @@ export const createLogger =
 	(callback) => {
 		if (debug) console.log(callback());
 	};
+
+type PipeStage<T> = {
+	value: T;
+	map: <U>(cb: (current: T) => U) => PipeStage<U>;
+};
+
+export const startPipe = <T>(value: T): PipeStage<T> => ({
+	value,
+	map: (cb) => startPipe(cb(value)),
+});
+
+/**
+ * Given a type predicate construct an identity function which narrows the input type using the type predicate.
+ */
+export const validateWith =
+	<T, U extends T>(validator: (x: T) => x is U) =>
+	(value: T) => {
+		if (!validator(value))
+			throw new Error(`Invalid value: ${JSON.stringify(value)}`);
+		return value;
+	};
