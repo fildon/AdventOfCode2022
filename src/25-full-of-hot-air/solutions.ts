@@ -1,7 +1,7 @@
-import { getInputStrings, sum } from "../utils";
+import { getInputStrings, startPipe, sum, validateWith } from "../utils";
 
 type SnafuDigit = "2" | "1" | "0" | "-" | "=";
-const SnafuDigits = new Set("210-=");
+type SnafuNumber = Array<SnafuDigit>;
 
 const snafuLookup = {
 	"2": 2,
@@ -11,20 +11,13 @@ const snafuLookup = {
 	"=": -2,
 };
 
-const isSnafuDigit = (char: string): char is SnafuDigit =>
-	SnafuDigits.has(char);
+const isSnafuDigit = (x: string): x is SnafuDigit => "210-=".includes(x);
+const parseSnafu = (line: string): SnafuNumber =>
+	[...line].map(validateWith(isSnafuDigit));
 
-const parseDigits = (line: string): Array<SnafuDigit> =>
-	[...line].map((char) => {
-		if (!isSnafuDigit(char))
-			throw new Error(`Unrecognised input character: ${char}`);
-		return char;
-	});
-
-const toNumber = (snafu: Array<SnafuDigit>): number =>
+const toNumber = (snafu: SnafuNumber) =>
 	[...snafu]
-		.reverse()
-		.map((digit, i) => snafuLookup[digit] * 5 ** i)
+		.map((digit, i) => snafuLookup[digit] * 5 ** (snafu.length - i - 1))
 		.reduce(sum);
 
 const digitLookup = [
@@ -35,13 +28,16 @@ const digitLookup = [
 	{ diff: +1, digit: "-" },
 ];
 
-const toSnafu = (number: number): string => {
+const toSnafuFormat = (number: number): string => {
 	if (number === 0) return "";
 
 	const { diff, digit } = digitLookup[number % 5];
 
-	return `${toSnafu((number + diff) / 5)}${digit}`;
+	return `${toSnafuFormat((number + diff) / 5)}${digit}`;
 };
 
+const getFileTotal = (filePath: string) =>
+	getInputStrings(filePath).map(parseSnafu).map(toNumber).reduce(sum);
+
 export const solvePart1 = (filePath: string) =>
-	toSnafu(getInputStrings(filePath).map(parseDigits).map(toNumber).reduce(sum));
+	startPipe(filePath).map(getFileTotal).map(toSnafuFormat).value;
