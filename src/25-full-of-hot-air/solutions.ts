@@ -27,24 +27,20 @@ const toNumber = (snafu: Array<SnafuDigit>): number =>
 		.map((digit, i) => snafuLookup[digit] * 5 ** i)
 		.reduce(sum);
 
+const digitLookup = [
+	{ diff: +0, digit: "0" },
+	{ diff: -1, digit: "1" },
+	{ diff: -2, digit: "2" },
+	{ diff: +2, digit: "=" },
+	{ diff: +1, digit: "-" },
+];
+
 const toSnafu = (number: number): string => {
 	if (number === 0) return "";
-	const nextDigit = number % 5;
 
-	switch (nextDigit) {
-		case 4:
-			return `${toSnafu((number + 1) / 5)}-`;
-		case 3:
-			return `${toSnafu((number + 2) / 5)}=`;
-		case 2:
-			return `${toSnafu((number - 2) / 5)}2`;
-		case 1:
-			return `${toSnafu((number - 1) / 5)}1`;
-		case 0:
-			return `${toSnafu((number + 0) / 5)}0`;
-		default:
-			throw new Error(`Unexpected value: ${nextDigit}`);
-	}
+	const { diff, digit } = digitLookup[number % 5];
+
+	return `${toSnafu((number + diff) / 5)}${digit}`;
 };
 
 export const solvePart1 = (filePath: string) =>
